@@ -287,3 +287,62 @@ Record.prototype.create = function (set, setIndex, programId,userId, record) {
     result.programId = programId;
     return result;
 }
+
+
+function Program(){
+
+}
+
+Program.prototype.definition = {
+    name: 'Programs',
+    columnDefinitions: {
+        id: 'string',
+        name: 'string',
+        author: 'string',
+        private: 'string',
+        goal: 'string',
+        weeks: 'string',
+        days: 'string',
+        day1: 'string',
+        day2: 'string',
+        day3: 'string',
+        day4: 'string',
+        day5: 'string',
+        day6: 'string',
+        day7: 'string',
+    }
+}
+
+Program.prototype.clone = function(){
+    var clone = new program();
+    clone.name = this.name;
+    clone.author = this.author;
+    clone.private = this.private;
+    clone.goal = this.goal;
+    clone.weeks = this.weeks;
+    clone.days = this.days;
+    clone.day1 = this.day1;
+    clone.day2 = this.day2;
+    clone.day3 = this.day3;
+    clone.day4 = this.day4;
+    clone.day5 = this.day5;
+    clone.day6 = this.day6;
+    clone.day7 = this.day7;
+}
+
+Program.prototype.create = function(){
+    var clone = new program();
+    clone.name = this.name;
+    clone.author = this.author;
+    clone.private = this.private;
+    clone.goal = this.goal;
+    clone.weeks = this.weeks;
+    clone.days = this.days;
+    clone.day1 = this.day1;
+    clone.day2 = this.day2;
+    clone.day3 = this.day3;
+    clone.day4 = this.day4;
+    clone.day5 = this.day5;
+    clone.day6 = this.day6;
+    clone.day7 = this.day7;
+}
