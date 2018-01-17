@@ -21,98 +21,25 @@ app.service('syncService', function ($q) {
                     //         name: 'string'
                     //     }
                     // }),
-                    store.defineTable({
-                        name: 'Records',
-                        columnDefinitions: {
-                            id: 'string',
-                            date: 'string',
-                            setId: 'string',
-                            setNumber: 'string',
-                            record: 'string',
-                            userId: 'string',
-                            exerciseId: 'string',
-                            intensity: 'string',
-                            programId: 'string'
-                        }
-                    }).then(function () {
+                    store.defineTable(Record.prototype.definition).then(function () {
                         return syncContext.pull(new WindowsAzure.Query('Records').where({
                             userId: client.currentUser.userId
                         }), 'Records' + 'QueryId')
                     }),
 
-                    store.defineTable({
-                        name: 'Programs',
-                        columnDefinitions: {
-                            id: 'string',
-                            name: 'string',
-                            author: 'string',
-                            private: 'string',
-                            goal: 'string',
-                            weeks: 'string',
-                            days: 'string',
-                            day1: 'string',
-                            day2: 'string',
-                            day3: 'string',
-                            day4: 'string',
-                            day5: 'string',
-                            day6: 'string',
-                            day7: 'string',
-                        }
-                    }).then(function () {
+                    store.defineTable(Program.prototype.definition).then(function () {
                         return syncContext.pull(new WindowsAzure.Query('Programs'), 'Programs' + 'QueryId')
                     }),
 
-                    store.defineTable({
-                        name: 'Exercises',
-                        columnDefinitions: {
-                            id: 'string',
-                            name: 'string',
-                            bodyPart: 'string',
-                            type: 'string',
-                            intensityType: 'string',
-                            comments: 'string',
-                            equipment: 'string'
-                        }
-                    }).then(function () {
+                    store.defineTable().then(function () {
                         return syncContext.pull(new WindowsAzure.Query('Exercises'), 'Exercises' + 'QueryId')
                     }),
 
-                    store.defineTable({
-                        name: 'Sets',
-                        columnDefinitions: {
-                            id: 'string',
-                            programId: 'string',
-                            exerciseId: 'string',
-                            componentId: 'string',
-                            sets: 'string',
-                            reps: 'string',
-                            rest: 'string',
-                            tempo: 'string',
-                            intensity: 'string',
-                            comment: 'string',
-                            setOrder: 'int',
-                            superSet: 'bool',
-                            setType: 'string'
-                        }
-                    }).then(function () {
+                    store.defineTable().then(function () {
                         return syncContext.pull(new WindowsAzure.Query('Sets'), 'Sets' + 'QueryId')
                     }),
 
-                    store.defineTable({
-                        name: 'Components',
-                        columnDefinitions: {
-                            id: 'string',
-                            programId: 'string',
-                            rounds: 'string',
-                            rest: 'string',
-                            duration: 'string',
-                            week: 'int',
-                            day: 'int',
-                            componentOrder: 'int',
-                            name: 'string',
-                            type: 'string'
-                        }
-                    }).then(function () {
+                    store.defineTable().then(function () {
                         return syncContext.pull(new WindowsAzure.Query('Components'), 'Components' + 'QueryId')
                     })
                 ]
@@ -126,11 +53,46 @@ app.service('syncService', function ($q) {
         })
     }
 });
+
 app.factory('CloudSyncedList', function ($q, loginService, $filter) {
-
-
     function CloudSyncedList(tableName) {
         this.tableName = tableName
+        switch (tableName) {
+            case 'Programs':
+                this.ObjectType = Program;
+                break;
+            case 'Sets':
+                this.ObjectType = Set;
+                break;
+            case 'Records':
+                this.ObjectType = Record;
+                break;
+            case 'Exercises':
+                this.ObjectType = Exercise;
+                break;
+            case 'Components':
+                this.ObjectType = Component;
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    CloudSyncedList.prototype.toDTO = function (item) {
+        var dto = {}
+        for (var prop in this.ObjectType.prototype.definition.columnDefinitions) {
+            dto[prop] = item[prop];
+        }
+        return dto;
+    }
+
+    CloudSyncedList.prototype.fromDTO = function (dto) {
+        var program = new this.ObjectType();
+        for (var prop in this.ObjectType.prototype.definition.columnDefinitions) {
+            program[prop] = dto[prop];
+        }
+        return program;
     }
 
     var jsHtmlInitialize = function (filter, order) {
@@ -142,7 +104,11 @@ app.factory('CloudSyncedList', function ($q, loginService, $filter) {
             var load = function (skip) {
                 that.table.where(filter).orderBy('id').skip(skip).read()
                     .then(function (results) {
-                        that.list.push.apply(that.list, results);
+
+                        for (let index = 0; index < results.length; index++) {
+                            that.list.push(that.fromDTO(results[index]));
+                        }
+
                         if (results.nextLink) {
                             load(that.list.length);
                         } else {
@@ -178,7 +144,9 @@ app.factory('CloudSyncedList', function ($q, loginService, $filter) {
         var that = this;
         that.table = loginService.getClient().getSyncTable(that.tableName)
         return that.table.where(filter).orderBy(that.order).read().then(function (results) {
-            that.list.push.apply(that.list, results);
+            for (let index = 0; index < results.length; index++) {
+                that.list.push(that.fromDTO(results[index]));
+            }
         })
     }
 
@@ -192,25 +160,22 @@ app.factory('CloudSyncedList', function ($q, loginService, $filter) {
         var table = this.table;
         var list = this.list;
         var order = this.order;
-
-        if (item.id) {
-
+        var that = this;
+        var dto = this.toDTO(item);
+        if (dto.id && dto.id !="") {
             var itemIndex = list.indexOf(item);
-            delete item.createdAt;
-            delete item.updatedAt;
-            delete item.version;
-            delete item.$$hashKey;
-            delete item.ROW_NUMBER;
-            table.update(item)
+            table.update(dto)
                 .done(function (updatedItem) {
+                    updatedItem = that.fromDTO(updatedItem);
                     list[itemIndex] = updatedItem;
                     onDone(updatedItem);
                 }, function (err) {
                     alert("Failed To Update Item" + err)
                 });
         } else {
-            table.insert(item)
+            table.insert(dto)
                 .done(function (insertedItem) {
+                    insertedItem = that.fromDTO(insertedItem);
                     var i = 0;
                     while (i < list.length && list[i][order] < insertedItem[order]) {
                         i++;
@@ -242,6 +207,7 @@ app.factory('CloudSyncedList', function ($q, loginService, $filter) {
     return CloudSyncedList
 
 });
+
 
 function Record() {
 
@@ -275,7 +241,7 @@ Record.prototype.clone = function (record) {
     return clone;
 }
 
-Record.prototype.create = function (set, setIndex, programId,userId, record) {
+Record.prototype.create = function (set, setIndex, programId, userId, record) {
     var result = new Record();
     result.date = new Date();
     result.setId = set.id;
@@ -289,7 +255,7 @@ Record.prototype.create = function (set, setIndex, programId,userId, record) {
 }
 
 
-function Program(){
+function Program() {
 
 }
 
@@ -313,25 +279,10 @@ Program.prototype.definition = {
     }
 }
 
-Program.prototype.clone = function(){
-    var clone = new program();
-    clone.name = this.name;
-    clone.author = this.author;
-    clone.private = this.private;
-    clone.goal = this.goal;
-    clone.weeks = this.weeks;
-    clone.days = this.days;
-    clone.day1 = this.day1;
-    clone.day2 = this.day2;
-    clone.day3 = this.day3;
-    clone.day4 = this.day4;
-    clone.day5 = this.day5;
-    clone.day6 = this.day6;
-    clone.day7 = this.day7;
-}
 
-Program.prototype.create = function(){
-    var clone = new program();
+
+Program.prototype.create = function () {
+    var clone = new Program();
     clone.name = this.name;
     clone.author = this.author;
     clone.private = this.private;
@@ -345,4 +296,65 @@ Program.prototype.create = function(){
     clone.day5 = "Friday";
     clone.day6 = "Saturday";
     clone.day7 = "Sunday";
+    return clone;
+}
+
+
+function Set() {
+
+}
+
+Set.prototype.definition = {
+    name: 'Sets',
+    columnDefinitions: {
+        id: 'string',
+        programId: 'string',
+        exerciseId: 'string',
+        componentId: 'string',
+        sets: 'string',
+        reps: 'string',
+        rest: 'string',
+        tempo: 'string',
+        intensity: 'string',
+        comment: 'string',
+        setOrder: 'int',
+        superSet: 'bool',
+        setType: 'string'
+    }
+}
+function Exercise() {
+
+
+}
+Exercise.prototype.definition = {
+    name: 'Exercises',
+    columnDefinitions: {
+        id: 'string',
+        name: 'string',
+        bodyPart: 'string',
+        type: 'string',
+        intensityType: 'string',
+        comments: 'string',
+        equipment: 'string'
+    }
+}
+
+
+function Component() {
+
+}
+Component.prototype.definition = {
+    name: 'Components',
+    columnDefinitions: {
+        id: 'string',
+        programId: 'string',
+        rounds: 'string',
+        rest: 'string',
+        duration: 'string',
+        week: 'int',
+        day: 'int',
+        componentOrder: 'int',
+        name: 'string',
+        type: 'string'
+    }
 }
