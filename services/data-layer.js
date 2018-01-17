@@ -162,7 +162,7 @@ app.factory('CloudSyncedList', function ($q, loginService, $filter) {
         var order = this.order;
         var that = this;
         var dto = this.toDTO(item);
-        if (dto.id && dto.id !="") {
+        if (dto.id && dto.id != "") {
             var itemIndex = list.indexOf(item);
             table.update(dto)
                 .done(function (updatedItem) {
@@ -208,7 +208,6 @@ app.factory('CloudSyncedList', function ($q, loginService, $filter) {
 
 });
 
-
 function Record() {
 
 }
@@ -228,18 +227,17 @@ Record.prototype.definition = {
     }
 }
 
-Record.prototype.clone = function (record) {
-    var clone = new Record();
-    clone.date = this.date;
-    clone.setId = this.setId;
-    clone.setNumber = this.setNumber;
-    clone.record = this.record;
-    clone.userId = this.userId;
-    clone.exerciseId = this.exerciseId;
-    clone.intensity = this.intensity;
-    clone.programId = this.programId;
-    return clone;
+Record.prototype.clone = function () {
+    var result = new Record();
+    for (const prop in this) {
+        if (this.hasOwnProperty(prop)) {
+            result[prop] = this[prop];
+        }
+    }
+    result.id = "";
+    return result;
 }
+
 
 Record.prototype.create = function (set, setIndex, programId, userId, record) {
     var result = new Record();
@@ -257,6 +255,18 @@ Record.prototype.create = function (set, setIndex, programId, userId, record) {
 
 function Program() {
 
+}
+
+Program.prototype.clone = function () {
+    var result = new Program();
+    for (const prop in this) {
+        if (this.hasOwnProperty(prop)) {
+            result[prop] = this[prop];
+        }
+    }
+    result.id = "";
+    result.name = "Copy of " + this.name;
+    return result;
 }
 
 Program.prototype.definition = {
@@ -278,8 +288,6 @@ Program.prototype.definition = {
         day7: 'string',
     }
 }
-
-
 
 Program.prototype.create = function () {
     var clone = new Program();
@@ -322,6 +330,18 @@ Set.prototype.definition = {
         setType: 'string'
     }
 }
+
+Set.prototype.clone = function () {
+    var result = new Set();
+    for (const prop in this) {
+        if (this.hasOwnProperty(prop)) {
+            result[prop] = this[prop];
+        }
+    }
+    result.id = "";
+    return result;
+}
+
 function Exercise() {
 
 
@@ -339,6 +359,16 @@ Exercise.prototype.definition = {
     }
 }
 
+Exercise.prototype.clone = function () {
+    var result = new Exercise();
+    for (const prop in this) {
+        if (this.hasOwnProperty(prop)) {
+            result[prop] = this[prop];
+        }
+    }
+    result.id = "";
+    return result;
+}
 
 function Component() {
 
@@ -357,4 +387,14 @@ Component.prototype.definition = {
         name: 'string',
         type: 'string'
     }
+}
+Component.prototype.clone = function () {
+    var result = new Component();
+    for (const prop in this) {
+        if (this.hasOwnProperty(prop)) {
+            result[prop] = this[prop];
+        }
+    }
+    result.id = "";
+    return result;
 }
