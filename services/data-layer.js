@@ -3,12 +3,13 @@
 ////////////////
 
 app.service('syncService', function ($q) {
+    var syncServ = {};
     //Android Offline sync data store Singleton
     var store
     //Android Offline syncContext
     var syncContext
 
-    var initializeTables = function (client) {
+    syncServ.initializeTables = function (client) {
         return $q(function (resolve, reject) {
             store = new WindowsAzure.MobileServiceSqliteStore('store.db');
             syncContext = client.getSyncContext()
@@ -31,15 +32,15 @@ app.service('syncService', function ($q) {
                         return syncContext.pull(new WindowsAzure.Query('Programs'), 'Programs' + 'QueryId')
                     }),
 
-                    store.defineTable().then(function () {
+                    store.defineTable(Exercise.prototype.definition).then(function () {
                         return syncContext.pull(new WindowsAzure.Query('Exercises'), 'Exercises' + 'QueryId')
                     }),
 
-                    store.defineTable().then(function () {
+                    store.defineTable(Set.prototype.definition).then(function () {
                         return syncContext.pull(new WindowsAzure.Query('Sets'), 'Sets' + 'QueryId')
                     }),
 
-                    store.defineTable().then(function () {
+                    store.defineTable(Component.prototype.definition).then(function () {
                         return syncContext.pull(new WindowsAzure.Query('Components'), 'Components' + 'QueryId')
                     })
                 ]
@@ -52,6 +53,7 @@ app.service('syncService', function ($q) {
             })
         })
     }
+    return syncServ;
 });
 
 app.factory('CloudSyncedList', function ($q, loginService, $filter) {
