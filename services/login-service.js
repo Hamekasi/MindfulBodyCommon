@@ -1,4 +1,4 @@
-app.service('loginService', function ($q,syncService) {
+app.service('loginService', function ($q, syncService) {
 
     //Microsoft Azure MobileServiceClient Singleton 
     var client
@@ -9,7 +9,7 @@ app.service('loginService', function ($q,syncService) {
         return client
     }
 
-    this.refreshClient = function() {
+    this.refreshClient = function () {
         client = null;
         location.href = '\#';
     }
@@ -32,21 +32,15 @@ app.service('loginService', function ($q,syncService) {
                                     userId: client.currentUser.userId
                                 }).then(function () {
                                     if (window.cordova) {
-                                        syncService.initializeTables(client).then(function () {
-                                            resolve(client.currentUser)
-                                        })
-                                    } else {
-                                        resolve(client.currentUser)
+                                        syncService.initializeTables(client);
                                     }
+                                    resolve(client.currentUser);
                                 }, reject)
                             } else {
                                 if (window.cordova) {
-                                    syncService.initializeTables(client).then(function () {
-                                        resolve(client.currentUser)
-                                    })
-                                } else {
-                                    resolve(client.currentUser)
+                                    syncService.initializeTables(client);
                                 }
+                                resolve(client.currentUser);
                             }
                         }, reject)
                 }, reject);

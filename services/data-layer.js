@@ -1,7 +1,7 @@
 ////////////////
 // Data Layer //
 ////////////////
-
+var offlineSynced = false;
 app.service('syncService', function ($q) {
     var syncServ = {};
     //Android Offline sync data store Singleton
@@ -29,24 +29,33 @@ app.service('syncService', function ($q) {
                     }),
 
                     store.defineTable(Program.prototype.definition).then(function () {
-                        return syncContext.pull(new WindowsAzure.Query('Programs'), 'Programs' + 'QueryId')
+                        return syncContext.pull(new WindowsAzure.Query('Programs').where({
+                            deleted: false
+                        }), 'Programs' + 'QueryId')
                     }),
 
                     store.defineTable(Exercise.prototype.definition).then(function () {
-                        return syncContext.pull(new WindowsAzure.Query('Exercises'), 'Exercises' + 'QueryId')
+                        return syncContext.pull(new WindowsAzure.Query('Exercises').where({
+                            deleted: false
+                        }), 'Exercises' + 'QueryId')
                     }),
 
                     store.defineTable(Set.prototype.definition).then(function () {
-                        return syncContext.pull(new WindowsAzure.Query('Sets'), 'Sets' + 'QueryId')
+                        return syncContext.pull(new WindowsAzure.Query('Sets').where({
+                            deleted: false
+                        }), 'Sets' + 'QueryId')
                     }),
 
                     store.defineTable(Component.prototype.definition).then(function () {
-                        return syncContext.pull(new WindowsAzure.Query('Components'), 'Components' + 'QueryId')
+                        return syncContext.pull(new WindowsAzure.Query('Components').where({
+                            deleted: false
+                        }), 'Components' + 'QueryId')
                     })
                 ]
 
                 $q.all(promises).then(function () {
                     syncContext.push();
+                    OfflineSynced = true;
                     resolve()
                 })
 
@@ -78,6 +87,13 @@ app.factory('CloudSyncedList', function ($q, loginService, $filter) {
 
             default:
                 break;
+        }
+
+        if (window.cordova) {
+            // offline sync is currently disabled as the loading it slow
+            CloudSyncedList.prototype.initialize = offlineSynced ? cordovaInitialize : jsHtmlInitialize
+        } else {
+            CloudSyncedList.prototype.initialize = jsHtmlInitialize
         }
     }
 
@@ -150,12 +166,6 @@ app.factory('CloudSyncedList', function ($q, loginService, $filter) {
                 that.list.push(that.fromDTO(results[index]));
             }
         })
-    }
-
-    if (window.cordova) {
-        CloudSyncedList.prototype.initialize = cordovaInitialize
-    } else {
-        CloudSyncedList.prototype.initialize = jsHtmlInitialize
     }
 
     CloudSyncedList.prototype.upsert = function (item, onDone) {
@@ -357,7 +367,8 @@ Exercise.prototype.definition = {
         type: 'string',
         intensityType: 'string',
         comments: 'string',
-        equipment: 'string'
+        equipment: 'string',
+        image:'string'
     }
 }
 
