@@ -52,6 +52,43 @@ app.directive('stringToNumber', function () {
   };
 });
 
+app.service('Utilities', function () {
+  utilities = {}
+  utilities.scrollTo = function scrollTo(element, to, duration) {
+    var scrollHandle;
+    var start = element.scrollTop,
+      change = to - start,
+      currentTime = 0,
+      increment = 20;
+    if (scrollHandle != undefined) {
+      clearTimeout(scrollHandle);
+      scrollHandle = undefined;
+    }
+    var animateScroll = function () {
+      currentTime += increment;
+      var val = Math.easeInOutQuad(currentTime, start, change, duration);
+      element.scrollTop = val;
+      if (currentTime < duration) {
+        scrollHandle = setTimeout(animateScroll, increment);
+      }
+    };
+    animateScroll();
+    return scrollHandle;
+  }
+
+  //t = current time
+  //b = start value
+  //c = change in value
+  //d = duration
+  Math.easeInOutQuad = function (t, b, c, d) {
+    t /= d / 2;
+    if (t < 1) return c / 2 * t * t + b;
+    t--;
+    return -c / 2 * (t * (t - 2) - 1) + b;
+  };
+  return utilities;
+});
+
 app.service('repMaxCalc', function () {
   var repmax = {
     lookup: [1, 1, 0.93, 0.90, 0.86, 0.84, 0.82,
