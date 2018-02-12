@@ -32,7 +32,7 @@ Component.prototype.overridesNumberSets = function () {
     return this.type != "";
 }
 
-scopComponent.prototype.overridesNumberReps = function () {
+Component.prototype.overridesNumberReps = function () {
     var compType = this.type;
     return compType != "Tabata" && compType != "AMRAP";
 }
