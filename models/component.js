@@ -44,25 +44,25 @@ Component.prototype.overridesRest = function () {
 
 
 Component.prototype.showComponentRounds = function (component) {
-    return component.type == 'Superset' || component.type == 'Tabata' || component.type == 'EMOM';
+    return this.type == 'Superset' || this.type == 'Tabata' || this.type == 'EMOM';
 }
 
 Component.prototype.showComponentRest = function (component) {
-    return component.type == 'Superset' || component.type == 'Tabata';
+    return this.type == 'Superset' || this.type == 'Tabata';
 }
 
 Component.prototype.showComponentDuration = function (component) {
-    return component.type == 'AMRAP' || component.type == 'EMOM' || component.type == 'Tabata';
+    return this.type == 'AMRAP' || this.type == 'EMOM' || this.type == 'Tabata';
 }
 
 Component.prototype.getDurationLabel = function (component) {
-    if (component.type == 'AMRAP') return 'in';
-    if (component.type == 'EMOM') return 'every';
-    if (component.type == 'Tabata') return 'activity';
+    if (this.type == 'AMRAP') return 'in';
+    if (this.type == 'EMOM') return 'every';
+    if (this.type == 'Tabata') return 'activity';
 }
 
 Component.prototype.getRestLabel = function (component) {
-    if (component.type == 'Tabata') return 'rest'
+    if (this.type == 'Tabata') return 'rest'
     return 'rest';
 }
 
