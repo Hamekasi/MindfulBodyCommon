@@ -39,12 +39,12 @@ Component.prototype.overridesNumberReps = function () {
 
 Component.prototype.overridesRest = function () {
     var compType = this.type;
-    return compType != "Tabata" && compType != "AMRAP" && compType != "EMOM";
+    return compType != "Tabata" && compType != "AMRAP" && compType != "EMOM" && compType != "EMOM_ALT";
 }
 
 
 Component.prototype.showComponentRounds = function (component) {
-    return this.type == 'Superset' || this.type == 'Tabata' || this.type == 'EMOM';
+    return this.type == 'Superset' || this.type == 'Tabata' || this.type == 'EMOM' || this.type == 'EMOM_ALT';
 }
 
 Component.prototype.showComponentRest = function (component) {
@@ -52,12 +52,13 @@ Component.prototype.showComponentRest = function (component) {
 }
 
 Component.prototype.showComponentDuration = function (component) {
-    return this.type == 'AMRAP' || this.type == 'EMOM' || this.type == 'Tabata';
+    return this.type == 'AMRAP' || this.type == 'EMOM' || this.type == 'EMOM_ALT' || this.type == 'Tabata';
 }
 
 Component.prototype.getDurationLabel = function (component) {
     if (this.type == 'AMRAP') return 'in';
     if (this.type == 'EMOM') return 'every';
+    if (this.type == 'EMOM_ALT') return 'every';
     if (this.type == 'Tabata') return 'activity';
 }
 
@@ -68,5 +69,5 @@ Component.prototype.getRestLabel = function (component) {
 
 Component.prototype.needsManualStart = function () {
     var componentType = this.type;
-    return componentType == "AMRAP" || componentType == "EMOM" || componentType == "Tabata"
+    return componentType == "AMRAP" || componentType == "EMOM" || componentType == "EMOM_ALT"  || componentType == "Tabata"
 }
