@@ -106,6 +106,9 @@ app.factory('CloudSyncedList', function ($q, loginService, $filter) {
     }
 
     CloudSyncedList.prototype.fromDTO = function (dto) {
+        if(this.ObjectType.fromDTO){
+            return this.ObjectType.fromDTO(dto);
+        }
         var program = new this.ObjectType();
         for (var prop in this.ObjectType.prototype.definition.columnDefinitions) {
             program[prop] = dto[prop];
