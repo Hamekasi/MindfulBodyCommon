@@ -209,6 +209,9 @@ SupersetComponent.prototype = new Component();
 SupersetComponent.prototype.next = function ($scope) {
     var result = nextExerciseSupereset($scope) || nextRoundSupereset($scope);
     var set = $scope.currentComponent.sets[$scope.currentExerciseIndex];
+    if($scope.currentComponent.sets.length - 1 == $scope.currentExerciseIndex){
+        set.rest = this.rest;
+    }
     $scope.timerControl.resetTo(set.rest, "Rest");
     $scope.buttonMode = "done";
     return result;
