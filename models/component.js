@@ -39,7 +39,7 @@ Component.prototype.overridesNumberReps = function () {
 
 Component.prototype.overridesRest = function () {
     var compType = this.type;
-    return compType == "Tabata" || compType == "AMRAP" || compType == "EMOM" || compType != "EMOM_ALT";
+    return compType == "Tabata" || compType == "AMRAP" || compType == "EMOM" || compType == "EMOM_ALT";
 }
 
 
