@@ -276,16 +276,41 @@ function EMOM_ALTComponent() {
 }
 EMOM_ALTComponent.prototype = new Component();
 EMOM_ALTComponent.prototype.next = function ($scope) {
-    var result = nextExerciseSupereset($scope) || nextRoundSupereset($scope);
-    if (result) {
+  
+    if ($scope.currentExerciseIndex < $scope.currentComponent.sets.length - 1) {
+        $scope.currentExerciseIndex++;
+    } else if($scope.currentRoundIndex < $scope.currentComponent.rounds - 1) {
+        $scope.currentExerciseIndex = 0;
+    }
+
+    var result = false;
+    if ($scope.currentRoundIndex < $scope.currentComponent.rounds - 1) {
+        $scope.currentRoundIndex++;
+        $scope.currentSetIndex = $scope.currentRoundIndex;
+        result = true;
         $scope.timerControl.resetTo(this.duration, "EMOM Time");
         $scope.buttonMode = "startComponent";
-    }
+    } 
+    
     return result;
     
 }
 EMOM_ALTComponent.prototype.previous = function ($scope) {
-    var result =  previousExerciseSuperset($scope) || previousRoundSupereset($scope);
+   
+    var result = false;
+    if ($scope.currentExerciseIndex > 0) {
+        $scope.currentExerciseIndex--;
+        result = true;
+    } else if($scope.currentRoundIndex > 0) {
+        $scope.currentExerciseIndex = $scope.currentComponent.sets.length - 1;
+    }
+   
+    if ($scope.currentRoundIndex > 0) {
+        $scope.currentRoundIndex--;
+        $scope.currentSetIndex = $scope.currentRoundIndex;
+        result = true;
+    }
+
     if (result) {
         $scope.timerControl.resetTo(this.duration, "EMOM Time");
         $scope.buttonMode = "startComponent";
