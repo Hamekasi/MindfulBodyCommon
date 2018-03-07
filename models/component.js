@@ -112,6 +112,9 @@ Component.fromDTO = function (dto) {
 
 var nextSet = function ($scope) {
     var set = $scope.currentComponent.sets[$scope.currentExerciseIndex];
+    if(!set){
+        return false;
+    }
     if ($scope.currentSetIndex < set.sets - 1) {
         $scope.currentSetIndex++;
         return true;
@@ -140,7 +143,11 @@ var previousExercise = function ($scope) {
 
     if ($scope.currentExerciseIndex > 0) {
         $scope.currentExerciseIndex--
-        $scope.currentSetIndex = $scope.currentComponent.sets[$scope.currentExerciseIndex].sets - 1;
+        var set = $scope.currentComponent.sets[$scope.currentExerciseIndex];
+        if(!set) {
+            return false;
+        }
+        $scope.currentSetIndex = set.sets - 1;
         return true;
     }
     return false;
@@ -189,6 +196,9 @@ NormalComponent.prototype = new Component();
 NormalComponent.prototype.next = function ($scope) {
     var result = nextSet($scope) || nextExercise($scope);
     var set = $scope.currentComponent.sets[$scope.currentExerciseIndex];
+    if(!set) {
+        return false;
+    }
     $scope.timerControl.resetTo(set.rest, "Rest");
     $scope.buttonMode = "done";
     return result;
@@ -196,6 +206,9 @@ NormalComponent.prototype.next = function ($scope) {
 NormalComponent.prototype.previous = function ($scope) {
     var result = previousSet($scope) || previousExercise($scope);
     var set = $scope.currentComponent.sets[$scope.currentExerciseIndex];
+    if(!set) {
+        return false;
+    }
     $scope.timerControl.resetTo(set.rest, "Rest");
     $scope.buttonMode = "done";
     return result;
@@ -209,7 +222,10 @@ SupersetComponent.prototype = new Component();
 SupersetComponent.prototype.next = function ($scope) {
     var result = nextExerciseSupereset($scope) || nextRoundSupereset($scope);
     var set = $scope.currentComponent.sets[$scope.currentExerciseIndex];
-    if($scope.currentComponent.sets.length - 1 == $scope.currentExerciseIndex){
+    if(!set) {
+        return false;
+    }
+    if ($scope.currentComponent.sets.length - 1 == $scope.currentExerciseIndex) {
         set.rest = this.rest;
     }
     $scope.timerControl.resetTo(set.rest, "Rest");
@@ -219,6 +235,9 @@ SupersetComponent.prototype.next = function ($scope) {
 SupersetComponent.prototype.previous = function ($scope) {
     var result = previousExerciseSuperset($scope) || previousRoundSupereset($scope);
     var set = $scope.currentComponent.sets[$scope.currentExerciseIndex];
+    if (!set) {
+        return false;
+    }
     $scope.timerControl.resetTo(set.rest, "Rest");
     $scope.buttonMode = "done";
     return result;
@@ -243,7 +262,7 @@ EMOMComponent.prototype.next = function ($scope) {
 }
 
 EMOMComponent.prototype.previous = function ($scope) {
-    if(previousExerciseSuperset($scope)){
+    if (previousExerciseSuperset($scope)) {
         return true;
     }
 
@@ -276,10 +295,10 @@ function EMOM_ALTComponent() {
 }
 EMOM_ALTComponent.prototype = new Component();
 EMOM_ALTComponent.prototype.next = function ($scope) {
-  
+
     if ($scope.currentExerciseIndex < $scope.currentComponent.sets.length - 1) {
         $scope.currentExerciseIndex++;
-    } else if($scope.currentRoundIndex < $scope.currentComponent.rounds - 1) {
+    } else if ($scope.currentRoundIndex < $scope.currentComponent.rounds - 1) {
         $scope.currentExerciseIndex = 0;
     }
 
@@ -290,21 +309,21 @@ EMOM_ALTComponent.prototype.next = function ($scope) {
         result = true;
         $scope.timerControl.resetTo(this.duration, "EMOM Time");
         $scope.buttonMode = "startComponent";
-    } 
-    
+    }
+
     return result;
-    
+
 }
 EMOM_ALTComponent.prototype.previous = function ($scope) {
-   
+
     var result = false;
     if ($scope.currentExerciseIndex > 0) {
         $scope.currentExerciseIndex--;
         result = true;
-    } else if($scope.currentRoundIndex > 0) {
+    } else if ($scope.currentRoundIndex > 0) {
         $scope.currentExerciseIndex = $scope.currentComponent.sets.length - 1;
     }
-   
+
     if ($scope.currentRoundIndex > 0) {
         $scope.currentRoundIndex--;
         $scope.currentSetIndex = $scope.currentRoundIndex;
@@ -371,7 +390,7 @@ function TabataComponent() {
 }
 TabataComponent.prototype = new Component();
 TabataComponent.prototype.next = function ($scope) {
-    var result =  nextExerciseSupereset($scope) || nextRoundSupereset($scope);
+    var result = nextExerciseSupereset($scope) || nextRoundSupereset($scope);
     if (result) {
         $scope.timerControl.resetTo(this.duration, "Go!");
         $scope.buttonMode = "startComponent";
@@ -380,7 +399,7 @@ TabataComponent.prototype.next = function ($scope) {
 
 }
 TabataComponent.prototype.previous = function ($scope) {
-    var result =  previousExerciseSuperset($scope)|| previousRoundSupereset($scope);
+    var result = previousExerciseSuperset($scope) || previousRoundSupereset($scope);
     if (result) {
         $scope.timerControl.resetTo(this.duration, "Go!");
         $scope.buttonMode = "startComponent";
