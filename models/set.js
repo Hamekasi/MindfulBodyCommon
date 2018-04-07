@@ -1,5 +1,5 @@
 function Set() {
-
+    this.sets = 1;
 }
 
 Set.prototype.definition = {
