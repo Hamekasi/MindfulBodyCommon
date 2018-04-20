@@ -9,7 +9,7 @@ Record.prototype.definition = {
         date: 'string',
         setId: 'string',
         setNumber: 'string',
-        record: 'string',
+        recordValue: 'string',
         userId: 'string',
         exerciseId: 'string',
         intensity: 'string',
@@ -29,12 +29,12 @@ Record.prototype.clone = function () {
 }
 
 
-Record.prototype.create = function (userId, set, setNumber, record) {
+Record.prototype.create = function (userId, set, setNumber, recordValue) {
     var result = new Record();
     result.date = new Date();
     result.setId = set.id;
     result.setNumber = setNumber;
-    result.record = record;
+    result.recordValue = recordValue;
     result.userId = userId;
     result.exerciseId = set.exerciseId;
     result.intensity = set.intensity ? set.intensity : set.reps;
@@ -73,13 +73,13 @@ app.factory('Records', function ($q, CloudSyncedList) {
         return record;
     }
 
-    Records.prototype.addRecord = function (userId, set, setNumber, record) {
+    Records.prototype.addRecord = function (userId, set, setNumber, recordValue) {
         var d = $q.defer();
         var currentRecord = this.findRecord(set.id, setNumber);
         if (currentRecord) {
-            currentRecord.record = record;
+            currentRecord.recordValue = recordValue;
         } else {
-            currentRecord = Record.prototype.create(userId, set, setNumber, record);
+            currentRecord = Record.prototype.create(userId, set, setNumber, recordValue);
         }
         list.upsert(currentRecord, function (record) { d.resolve(record) });
         return d.promise;
