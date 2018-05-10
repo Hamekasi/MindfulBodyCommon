@@ -84,7 +84,9 @@ app.factory('CloudSyncedList', function ($q, loginService, $filter) {
             case 'Components':
                 this.ObjectType = Component;
                 break;
-
+            case 'Clients':
+                this.ObjectType = User;
+                break;
             default:
                 break;
         }
@@ -106,7 +108,7 @@ app.factory('CloudSyncedList', function ($q, loginService, $filter) {
     }
 
     CloudSyncedList.prototype.fromDTO = function (dto) {
-        if(this.ObjectType.fromDTO){
+        if (this.ObjectType.fromDTO) {
             return this.ObjectType.fromDTO(dto);
         }
         var program = new this.ObjectType();
