@@ -9,14 +9,20 @@ app.directive('editableLabel', function () {
   return {
     scope: {
       text: '=',
-      onChanged: '=',
+      onChanged: '&',
     },
-    template: "<input style='background:none' code='13' dl-key-code='edit=false;' ng-change='onChanged()' ng-show='edit' ng-blur='edit=false;' ng-model='text'></input> <div style='min-width:30px; min-height:20px;' ng-dblclick='edit=true' ng-show='!edit'>{{text}}</div>",
+    template: "<input style='background:none; width:100%; height:100%' code='13' dl-key-code='edit=false;' ng-show='edit' ng-blur='edit=false;' ng-model='text'></input> <div style='width:100%; height:100%' ng-dblclick='edit=true' ng-show='!edit'>{{text}}</div>",
     restrict: "E",
     link :function(scope, element, attrs){
-      scope.changed = function(){
-        console.log('here');
-      }
+      
+      var oldValue = scope.text;
+      scope.$watch('edit', function(){
+        if(scope.edit){
+          oldValue = scope.text;
+        } else if(scope.text != oldValue) {
+          scope.onChanged();
+        }
+      })
     }
   }
 })
