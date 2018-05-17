@@ -147,9 +147,10 @@ app.factory('CloudSyncedList', function ($q, loginService, $filter) {
                             resolve(that.list)
                         }
                     }, function (err) {
+                        loginService.refreshClient();
                         if (err.message == "Unauthorized") {
                             alert("Your Session has Expired.\nPlease login again.");
-                            loginService.refreshClient();
+                            
                         } else {
                             alert("Error: " + err);
                             reject(err);

@@ -9,7 +9,7 @@ Program.prototype.clone = function () {
             result[prop] = this[prop];
         }
     }
-    result.id = "";
+    delete result.id;
     result.name = "Copy of " + this.name;
     return result;
 }

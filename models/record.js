@@ -24,7 +24,7 @@ Record.prototype.clone = function () {
             result[prop] = this[prop];
         }
     }
-    result.id = "";
+    delete result.id;
     return result;
 }
 
