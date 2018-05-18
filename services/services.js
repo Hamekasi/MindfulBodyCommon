@@ -11,7 +11,7 @@ app.directive('editableLabel', function () {
       text: '=',
       onChanged: '&',
     },
-    template: "<input style='background:none; width:100%; height:100%' code='13' dl-key-code='edit=false;' ng-show='edit' ng-blur='edit=false;' ng-model='text'></input> <div style='width:100%; height:100%' ng-dblclick='edit=true' ng-show='!edit'>{{text}}</div>",
+    template: "<input style='background:none; width:100%; height:100%' code='13' dl-key-code='edit=false;' ng-show='edit' ng-blur='edit=false;' ng-model='text'></input> <div style='width:100%; height:100%' ng-click='edit=true' ng-show='!edit'>{{text}}</div>",
     restrict: "E",
     link :function(scope, element, attrs){
       
