@@ -4,7 +4,11 @@ app.service('loginService', function ($q, syncService) {
     var client
     this.getClient = function () {
         if (!client) {
-            client = new WindowsAzure.MobileServiceClient('https://fitbook.azurewebsites.net');
+            client = new WindowsAzure.MobileServiceClient('https://fitbook.azurewebsites.net')
+            .withFilter(function (request, next, callback) {
+                request.headers.Gym = "IPC";
+                next(request, callback);
+             });
         }
         return client
     }
